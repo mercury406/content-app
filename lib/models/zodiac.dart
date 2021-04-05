@@ -20,7 +20,7 @@ List<Zodiac> zodiacs = [
   new Zodiac(id:12, name: "Рыбы", imagePath: "assets/horoscope/monthly/ribi.png"),
 ];
 
-List<Zodiac> year_zodiacs = [
+List<Zodiac> yearZodiacs = [
   new Zodiac(id:1, name: "Крыса", imagePath: "assets/horoscope/yearly/krisa.png"),
   new Zodiac(id:2, name: "Бык", imagePath: "assets/horoscope/yearly/bik.png"),
   new Zodiac(id:3, name: "Тигр", imagePath: "assets/horoscope/yearly/tigr.png"),

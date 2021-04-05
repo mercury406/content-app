@@ -8,12 +8,20 @@ class SelectZodiacYearScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Выберите зодиак")),
       body: ListView.builder(
-        itemCount: year_zodiacs.length,
+        itemCount: yearZodiacs.length,
         itemBuilder: (BuildContext context, int index) {
-          return Card(
-            child: ListTile(
-              leading: Image.asset(year_zodiacs[index].imagePath, height: screenWidth * 0.4,),
-              title: Text(year_zodiacs[index].name),
+          return InkWell(
+            onTap: () {
+              Zodiac instance = zodiacs[index];
+              Navigator.pop(context, {
+                "instance": instance
+              });
+            },
+            child: Card(
+              child: ListTile(
+                  leading: Image.asset(yearZodiacs[index].imagePath, height: screenWidth * 0.4,),
+                  title: Text(yearZodiacs[index].name)
+              ),
             ),
           );
         },

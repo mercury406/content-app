@@ -32,20 +32,30 @@ class TopContainer extends StatefulWidget {
 }
 
 class _TopContainerState extends State<TopContainer> {
-  Map monthlyData = {};
+  int _monthlyIndex, _yearlyIndex;
 
-  Future<void> setSPref(int index) async{
-    // SharedPreferences.setMockInitialValues({});
-    var spref = await SharedPreferences.getInstance();
-    spref.setInt("monthly", index);
+  setSpref(String key, int value) async {
+    SharedPreferences spref = await SharedPreferences.getInstance();
+    spref.setInt(key, value);
+  }
+
+  _loadSPref(String key) async {
+    SharedPreferences spref = await SharedPreferences.getInstance();
+    int r = spref.getInt(key) ?? -1;
+    setState(() {
+      if(key == "monthly") _monthlyIndex = r;
+      else if(key == "yearly") _yearlyIndex = r;
+    });
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadSPref("monthly");
+    _loadSPref("yearly");
+  }
+  @override
   Widget build(BuildContext context) {
-
-    monthlyData = (monthlyData != null && monthlyData.isNotEmpty) ? monthlyData : ModalRoute.of(context).settings.arguments;
-    print(monthlyData);
-
     final double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.only(top: 48, left: 32, right: 48),
@@ -105,13 +115,10 @@ class _TopContainerState extends State<TopContainer> {
                 onTap: () async {
                   dynamic result = await Navigator.pushNamed(context, "/monthly");
                   if(result != null){
+                    print(result['instance'].id);
                     setState(() {
-                      monthlyData = {
-                        'id': result["id"],
-                        'title': result["title"],
-                        'imagePath': result['imagePath']
-                      };
-                      setSPref(result['id']);
+                      _monthlyIndex = result['instance'].id - 1;
+                      setSpref('monthly', _monthlyIndex);
                     });
                   }
                 },
@@ -120,13 +127,16 @@ class _TopContainerState extends State<TopContainer> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ClipRRect(
-                      child: Image.asset(monthlyData['imgPath'], height: screenHeight * 0.09),
+                      child: Image.asset(
+                          (_monthlyIndex == -1) ? "assets/horoscope/unknown.png" : zodiacs[_monthlyIndex].imagePath,
+                          height: screenHeight * 0.09),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
-                    Text( monthlyData['title'],
+                    Text(
+                      (_monthlyIndex == -1) ? "Невыбрано" : zodiacs[_monthlyIndex].name,
                       style: TextStyle(
                           color: textPrimaryColor, fontWeight: FontWeight.w500, fontSize: 18.0),
                     ),
@@ -134,22 +144,31 @@ class _TopContainerState extends State<TopContainer> {
                 ),
               ),
               InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/yearly");
+                onTap: () async {
+                  dynamic result = await Navigator.pushNamed(context, "/yearly");
+                  if(result != null){
+                    print(result['instance'].id);
+                    setState(() {
+                      _yearlyIndex = result['instance'].id - 1;
+                      setSpref('yearly', _yearlyIndex);
+                    });
+                  }
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ClipRRect(
-                      child: Image.asset(year_zodiacs[0].imagePath, height: screenHeight * 0.09),
+                      child: Image.asset(
+                          (_yearlyIndex == -1) ? "assets/horoscope/unknown.png" : yearZodiacs[_yearlyIndex].imagePath,
+                          height: screenHeight * 0.09),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
                     Text(
-                      year_zodiacs[0].name,
+                        (_yearlyIndex == -1) ? "Невыбрано" : yearZodiacs[_yearlyIndex].name,
                       style: TextStyle(
                           color: textPrimaryColor, fontWeight: FontWeight.w500, fontSize: 18.0),
                     ),
